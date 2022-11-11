@@ -1,6 +1,5 @@
-import { useParams } from 'react-router-dom';
-import { useEffect } from 'react';
-import { useState } from 'react';
+import { useParams, Link, Outlet } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 const MovieDetails = () => {
   const [movie, setMovie] = useState();
@@ -21,8 +20,6 @@ const MovieDetails = () => {
     fetchData();
   }, [movieId]);
 
-  console.log(movie);
-
   if (movie) {
     return (
       <>
@@ -39,6 +36,16 @@ const MovieDetails = () => {
         <p>{movie.overview}</p>
         <h2>Genres</h2>
         <p>{movie.genres.map(genre => genre.name).join(', ')}</p>
+        <h3>Additional information</h3>
+        <ul>
+          <li>
+            <Link to="cast">Cast</Link>
+          </li>
+          <li>
+            <Link to="reviews">Reviews</Link>
+          </li>
+        </ul>
+        <Outlet />
       </>
     );
   }
