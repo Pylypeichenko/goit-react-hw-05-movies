@@ -21,7 +21,8 @@ const Reviews = () => {
     fetchData();
   }, [movieId]);
 
-  return reviews === [] ? (
+  console.log(reviews);
+  return reviews.length === 0 ? (
     <p>There are no reviews yet</p>
   ) : (
     <ul>
