@@ -6,7 +6,6 @@ import PhotoReplacer from '../PhotoReplacer/PhotoReplacer';
 
 const Cast = () => {
   const [cast, setCast] = useState();
-
   const { movieId } = useParams();
 
   useEffect(() => {

@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const Home = () => {
   const [movies, setMovies] = useState([]);
+  const location = useLocation();
 
   useEffect(() => {
     const API_KEY = 'cd7ce70f2d16b0604871e7d56e1ab9d8';
@@ -27,7 +28,7 @@ const Home = () => {
           {movies.map(movie => {
             return (
               <li key={movie.id}>
-                <Link to={`movies/${movie.id}`}>
+                <Link to={`movies/${movie.id}`} state={{ from: location }}>
                   <img
                     src={'https://image.tmdb.org/t/p/w200' + movie.poster_path}
                     alt={movie.original_title}

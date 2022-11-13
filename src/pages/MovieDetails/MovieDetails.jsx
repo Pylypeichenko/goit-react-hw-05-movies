@@ -1,28 +1,42 @@
-import { useParams, Link, Outlet } from 'react-router-dom';
+import { useParams, Link, Outlet, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 const MovieDetails = () => {
   const [movie, setMovie] = useState();
-
   const { movieId } = useParams();
+  const location = useLocation();
+  const backLinkHref = location.state?.from ?? '/movies';
 
   useEffect(() => {
-    const API_KEY = 'cd7ce70f2d16b0604871e7d56e1ab9d8';
-    const BASIC_URL = 'https://api.themoviedb.org/3';
-    const movieDetailsUrl = `${BASIC_URL}/movie/${movieId}?api_key=${API_KEY}`;
+    try {
+      const API_KEY = 'cd7ce70f2d16b0604871e7d56e1ab9d8';
+      const BASIC_URL = 'https://api.themoviedb.org/3';
+      const movieDetailsUrl = `${BASIC_URL}/movie/${movieId}?api_key=${API_KEY}`;
 
-    const fetchData = () => {
-      return fetch(movieDetailsUrl)
-        .then(response => response.json())
-        .then(data => setMovie(data));
-    };
+      const fetchData = () => {
+        return fetch(movieDetailsUrl)
+          .then(response => {
+            if (response.ok) {
+              return response.json();
+            }
+          })
+          .then(data => setMovie(data));
+      };
 
-    fetchData();
+      fetchData();
+    } catch (error) {
+      console.log(error);
+    }
   }, [movieId]);
 
   if (movie) {
+    console.log(location.state.from);
+
     return (
       <>
+        <Link to={backLinkHref} state={{ from: location.state.from }}>
+          Back to movies
+        </Link>
         <img
           src={'https://image.tmdb.org/t/p/w300' + movie.poster_path}
           alt={movie.original_title || movie.original_name}
@@ -39,16 +53,27 @@ const MovieDetails = () => {
         <h3>Additional information</h3>
         <ul>
           <li>
-            <Link to="cast">Cast</Link>
+            <Link to="cast" state={{ from: location }}>
+              Cast
+            </Link>
           </li>
           <li>
-            <Link to="reviews">Reviews</Link>
+            <Link to="reviews" state={{ from: location }}>
+              Reviews
+            </Link>
           </li>
         </ul>
         <Outlet />
       </>
     );
   }
+
+  return (
+    <p>
+      We couldn't found this movie information. Please, return BACK and try
+      another one.
+    </p>
+  );
 };
 
 export default MovieDetails;
