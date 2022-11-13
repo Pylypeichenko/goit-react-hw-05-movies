@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
 
+import { Notify } from './NotFound.styled';
+
 const NotFound = () => {
   return (
-    <div>
-      <p>
-        This page was not found. Please return BACK or go to{' '}
-        <Link to="/">main page</Link>{' '}
-      </p>
-    </div>
+    <Notify>
+      This page was not found. Please return to &#32;
+      <Link to="/">main page</Link>
+    </Notify>
   );
 };
 

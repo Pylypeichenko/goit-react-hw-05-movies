@@ -1,33 +1,24 @@
-import { useEffect } from 'react';
-import { useState } from 'react';
+import { useEffect, useState, lazy } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import MoviesMatches from '../../components/MoviesMatches/MoviesMatches';
+import { searchMovies } from '../../service-API/movies-API';
+
+import { Container } from '../../components/common.styled/common.styled';
+import { Form } from './Movies.styled';
+
+const MoviesMatches = lazy(() =>
+  import('../../components/MoviesMatches/MoviesMatches')
+);
 
 const Movies = () => {
-  //   const [searchQuery, setSearchQuery] = useState('');
-  const [movies, setMovies] = useState([]);
+  const [movies, setMovies] = useState();
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get('query') ?? '';
 
   useEffect(() => {
     if (searchQuery !== '') {
       try {
-        const API_KEY = 'cd7ce70f2d16b0604871e7d56e1ab9d8';
-        const BASIC_URL = 'https://api.themoviedb.org/3';
-        const searchMoviesUrl = `${BASIC_URL}/search/movie?api_key=${API_KEY}&query=${searchQuery}`;
-
-        const fetchData = () => {
-          return fetch(searchMoviesUrl)
-            .then(response => {
-              if (response.ok) {
-                return response.json();
-              }
-            })
-            .then(data => setMovies(data.results));
-        };
-
-        fetchData();
+        searchMovies(searchQuery).then(data => setMovies(data.results));
       } catch (error) {
         console.log(error);
       }
@@ -37,12 +28,7 @@ const Movies = () => {
   const updateQueryString = query => {
     const nextParams = query !== '' ? { query } : {};
     setSearchParams(nextParams);
-    console.log(nextParams);
   };
-
-  //   const handleChange = e => {
-  //       setSearchQuery(e.target.value.toLowerCase().trim());
-  //   };
 
   const onFormSubmit = e => {
     e.preventDefault();
@@ -50,25 +36,17 @@ const Movies = () => {
   };
 
   return (
-    <>
-      <form onSubmit={onFormSubmit}>
+    <Container>
+      <Form onSubmit={onFormSubmit}>
         <label htmlFor="search">Find some movie you would like to watch</label>
-        <input
-          type="text"
-          id="search"
-          name="input"
-          //   value={searchQuery}
-          //   onChange={e => updateQueryString(e.target.value)}
-        />
+        <input type="text" id="search" name="input" />
         <button type="submit">Search</button>
-      </form>
-      {movies.length > 0 && (
-        <MoviesMatches movies={movies} searchQuery={searchQuery} />
-      )}
-      {/* {movies.length === 0 && (
+      </Form>
+      {movies && movies.length > 0 && <MoviesMatches movies={movies} />}
+      {movies && movies.length === 0 && (
         <p>We haven't found anything. Try another movie title</p>
-      )} */}
-    </>
+      )}
+    </Container>
   );
 };
 

@@ -1,68 +1,72 @@
 import { useParams, Link, Outlet, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
+
+import { choosenMovieInfo } from '../../service-API/movies-API';
+
+import { Container } from 'components/common.styled/common.styled';
+import {
+  MovieMainInfo,
+  MainInfoWrapper,
+  Text,
+  MovieAddInfo,
+  AddInfoList,
+  LinkBackwards,
+} from './MovieDetails.styled';
 
 const MovieDetails = () => {
   const [movie, setMovie] = useState();
   const { movieId } = useParams();
   const location = useLocation();
-  const backLinkHref = location.state?.from ?? '/movies';
+  const backLinkHref = location.state?.from ?? '/';
 
   useEffect(() => {
     try {
-      const API_KEY = 'cd7ce70f2d16b0604871e7d56e1ab9d8';
-      const BASIC_URL = 'https://api.themoviedb.org/3';
-      const movieDetailsUrl = `${BASIC_URL}/movie/${movieId}?api_key=${API_KEY}`;
-
-      const fetchData = () => {
-        return fetch(movieDetailsUrl)
-          .then(response => {
-            if (response.ok) {
-              return response.json();
-            }
-          })
-          .then(data => setMovie(data));
-      };
-
-      fetchData();
+      choosenMovieInfo(movieId).then(data => setMovie(data));
     } catch (error) {
       console.log(error);
     }
   }, [movieId]);
 
   if (movie) {
-    // console.log(location.state.from);
-
     return (
-      <>
-        <Link to={backLinkHref}>Back to movies</Link>
-        <img
-          src={'https://image.tmdb.org/t/p/w300' + movie.poster_path}
-          alt={movie.original_title || movie.original_name}
-        />
-        <h1>
-          {movie.original_title || movie.original_name} (
-          {movie.release_date.slice(0, 4)})
-        </h1>
-        <p>User score: {movie.vote_average.toFixed(1) * 10}%</p>
-        <h2>Overview</h2>
-        <p>{movie.overview}</p>
-        <h2>Genres</h2>
-        <p>{movie.genres.map(genre => genre.name).join(', ')}</p>
-        <h3>Additional information</h3>
-        <ul>
-          <li>
-            <Link to="cast" state={{ from: location }}>
-              Cast
-            </Link>
-          </li>
-          <li>
-            <Link to="reviews" state={{ from: location }}>
-              Reviews
-            </Link>
-          </li>
-        </ul>
-        <Outlet />
-      </>
+      <Container>
+        <LinkBackwards to={backLinkHref}>Back to movies</LinkBackwards>
+        <MovieMainInfo>
+          <img
+            src={'https://image.tmdb.org/t/p/w300' + movie.poster_path}
+            alt={movie.original_title || movie.original_name}
+          />
+          <MainInfoWrapper>
+            <h1>
+              {movie.original_title || movie.original_name} (
+              {movie.release_date.slice(0, 4)})
+            </h1>
+            <Text>User score: {movie.vote_average.toFixed(1) * 10}%</Text>
+            <h2>Overview</h2>
+            <Text>{movie.overview}</Text>
+            <h2>Genres</h2>
+            <Text>{movie.genres.map(genre => genre.name).join(', ')}</Text>
+          </MainInfoWrapper>
+        </MovieMainInfo>
+        <MovieAddInfo>
+          <h3>Additional information</h3>
+          <AddInfoList>
+            <li>
+              <Link to="cast" state={{ from: backLinkHref }}>
+                Cast
+              </Link>
+            </li>
+            <li>
+              <Link to="reviews" state={{ from: backLinkHref }}>
+                Reviews
+              </Link>
+            </li>
+          </AddInfoList>
+        </MovieAddInfo>
+        <Suspense fallback={<div>Loading info for you ...</div>}>
+          <Outlet />
+        </Suspense>
+      </Container>
     );
   }
 
