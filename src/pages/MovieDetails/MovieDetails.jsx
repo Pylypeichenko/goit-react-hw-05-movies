@@ -30,13 +30,11 @@ const MovieDetails = () => {
   }, [movieId]);
 
   if (movie) {
-    console.log(location.state.from);
+    // console.log(location.state.from);
 
     return (
       <>
-        <Link to={backLinkHref} state={{ from: location.state.from }}>
-          Back to movies
-        </Link>
+        <Link to={backLinkHref}>Back to movies</Link>
         <img
           src={'https://image.tmdb.org/t/p/w300' + movie.poster_path}
           alt={movie.original_title || movie.original_name}
